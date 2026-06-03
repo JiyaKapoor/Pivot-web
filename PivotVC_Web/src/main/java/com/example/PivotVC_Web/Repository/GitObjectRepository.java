@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GitObjectRepository extends JpaRepository<GitObject, Long> {
+    boolean existsBySha(String sha);
 }

@@ -10,9 +10,6 @@ public class TreeEntry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "tree_node_id", nullable = false)
-    private TreeNode treeNode;
 
     @Column(nullable = false)
     private String name;
@@ -33,12 +30,12 @@ public class TreeEntry {
     }
 
     public Long getId() { return id; }
-    public TreeNode getTreeNode() { return treeNode; }
+
     public String getName() { return name; }
     public EntryType getType() { return type; }
     public String getSha() { return sha; }
 
-    public void setTreeNode(TreeNode treeNode) { this.treeNode = treeNode; }
+
     public void setName(String name) { this.name = name; }
     public void setType(EntryType type) { this.type = type; }
     public void setSha(String sha) { this.sha = sha; }

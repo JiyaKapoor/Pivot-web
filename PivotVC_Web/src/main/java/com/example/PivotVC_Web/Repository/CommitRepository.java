@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CommitRepository extends JpaRepository<Commit,Long> {
-    Commit findByCommitSha(String commitSha);
+    Commit findBySha(String commitSha);
 }

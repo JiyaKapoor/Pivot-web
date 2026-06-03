@@ -10,6 +10,7 @@ import com.example.PivotVC_Web.Services.CommitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,11 +24,23 @@ public class CommitController {
     @Autowired
     private UserRepository userRepository;
     @PostMapping("/commit")
-    public ResponseEntity<String> commit(@RequestParam Long repoId, @RequestParam Long userId, @RequestParam String message){
+    public ResponseEntity<String> commit(@RequestParam Long repoId, @RequestParam Long userId, @RequestParam String message,@RequestParam String filePath,
+                                         @RequestParam MultipartFile file){
         GitRepository gitRepository=repoRepository.findById(repoId).orElseThrow(()-> new RuntimeException());
         User user=userRepository.findById(userId).orElseThrow(()->new RuntimeException());
-        commitService.commit(gitRepository,user,message);
-        return ResponseEntity.ok("Commit succesful");
+        try {
+            commitService.commitAdd(
+                    gitRepository,
+                    user,
+                    message,
+                    filePath,
+                    file.getBytes()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Commit failed", e);
+        }
+
+        return ResponseEntity.ok("Commit successful");
     }
     @GetMapping("/commit-log")
     public ResponseEntity<List<Commit>> log(@RequestParam Long repoId){

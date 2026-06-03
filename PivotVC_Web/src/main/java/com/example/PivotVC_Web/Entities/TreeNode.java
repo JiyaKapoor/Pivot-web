@@ -17,8 +17,8 @@ public class TreeNode {
 
     @Column(name = "repo_id", nullable = false)
     private Long repoId;
-
-    @OneToMany(mappedBy = "treeNode", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "tree_node_id", nullable = false)
     private List<TreeEntry> entries = new ArrayList<>();
 
     public TreeNode() {}
@@ -39,11 +39,9 @@ public class TreeNode {
 
     public void addEntry(TreeEntry entry) {
         entries.add(entry);
-        entry.setTreeNode(this);
     }
 
     public void removeEntry(TreeEntry entry) {
         entries.remove(entry);
-        entry.setTreeNode(null);
     }
 }

@@ -2,11 +2,10 @@ package com.example.PivotVC_Web.Services;
 
 import com.example.PivotVC_Web.Entities.*;
 import com.example.PivotVC_Web.Repository.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -24,19 +23,31 @@ public class CommitService {
     TreeNodeRepository treeNodeRepository;
     @Autowired
     CommitRepository commitRepository;
-    public void commit(GitRepository gitRepository, User user,String message){
-        List<StagingEntry> currIdx=stagingEntryRepository.findByRepoAndUser(gitRepository,user);
-        //now we need to track the files which were already present in the branch
+    @Autowired
+    GitObjectRepository gitObjectRepository;
+    @Autowired
+    SupabaseStorageService supabaseStorageService;
+    @Transactional
+    public void commitAdd(GitRepository gitRepository,User user,String message,String filePath,byte[] fileContent){
         Head head=headRepository.findByRepoId(gitRepository.getId());
         String commitSha;
         if(head.getRefType()==RefType.DETACHED)commitSha=head.getCommitSha();
         else{
             String branchName=head.getBranchName();
-            Branch branch=branchRepository.findByName(branchName);
+            Branch branch=branchRepository.findByRepoAndName(gitRepository,branchName);
             commitSha=branch.getHeadCommitSha();
         }
-        //now we load the current tree using this commitSha
-        Set<TreeEntry> entries=treeService.buildTree(commitSha,currIdx);
+        String blobSha=ComputeSha.computeBlobSha(fileContent);
+        // Add this after computing blobSha
+        if (!gitObjectRepository.existsBySha(blobSha)) {
+            String blobPath = "repos/" + gitRepository.getId() + "/blob/"
+                    +blobSha;
+            GitObject blobObject = new GitObject(blobSha, gitRepository.getId(),
+                    GitObject.ObjectType.BLOB, blobPath, (long) fileContent.length);
+            gitObjectRepository.save(blobObject);
+            supabaseStorageService.upload(blobPath, fileContent);
+        }
+        Set<TreeEntry> entries=treeService.buildTreeAdd(commitSha,filePath,blobSha);
         TreeNode node=new TreeNode(gitRepository.getId(),entries.stream().toList());
         StringBuilder sb = new StringBuilder();
 
@@ -54,8 +65,12 @@ public class CommitService {
         String treeSha = ComputeSha.computeBlobSha(sb.toString().getBytes());
         node.setSha(treeSha);
         treeNodeRepository.save(node);
+        String treePath="repos/"+gitRepository.getId()+"/trees/"+treeSha;
+        Long size=(long)sb.toString().getBytes().length;
+        GitObject treeObject=new GitObject(treeSha,gitRepository.getId(),GitObject.ObjectType.TREE,treePath,size);
+        gitObjectRepository.save(treeObject);
+        supabaseStorageService.upload(treePath,sb.toString().getBytes());
         LocalDateTime timestamp = LocalDateTime.now();
-
         Commit commit = new Commit(
                 gitRepository,
                 treeSha,
@@ -66,28 +81,32 @@ public class CommitService {
         );
 
         String commitContent =
-                treeSha +
-                        commitSha +
-                        message +
-                        user.getUsername() +
+                treeSha + "\n" +
+                        commitSha + "\n" +
+                        message + "\n" +
+                        user.getUsername() + "\n" +
                         timestamp;
 
         String newCommitSha =
                 ComputeSha.computeBlobSha(commitContent.getBytes());
 
-        commit.setCommitSha(newCommitSha);
+        commit.setSha(newCommitSha);
         commitRepository.save(commit);
+        Long commitSize=(long)commitContent.getBytes().length;
+        String commitStoragePath="repos/"+gitRepository.getId()+"/commit/"+newCommitSha;
+        GitObject commitObject=new GitObject(newCommitSha, gitRepository.getId(), GitObject.ObjectType.COMMIT,commitStoragePath,commitSize);
+        gitObjectRepository.save(commitObject);
+        supabaseStorageService.upload(commitStoragePath,commitContent.getBytes());
         if(head.getRefType()==RefType.DETACHED){
             head.setCommitSha(newCommitSha);
             headRepository.save(head);
         }
         else{
             String branchName=head.getBranchName();
-            Branch branch=branchRepository.findByName(branchName);
+            Branch branch=branchRepository.findByRepoAndName(gitRepository,branchName);
             branch.setHeadCommitSha(newCommitSha);
             branchRepository.save(branch);
         }
-        stagingEntryRepository.deleteAll(currIdx);
     }
     public List<Commit> log(GitRepository gitRepository){
         //prints the commit history of whichever brnach we are on
@@ -111,7 +130,7 @@ public class CommitService {
         vis.add(currCommit);
         while(!q.isEmpty()){
             String latestCommit=q.poll();
-            Commit commit=commitRepository.findByCommitSha(latestCommit);
+            Commit commit=commitRepository.findBySha(latestCommit);
             commitLog.add(commit);
             String parentSha=commit.getParentSha();
             if(parentSha != null && !vis.contains(parentSha)){
