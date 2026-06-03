@@ -61,6 +61,7 @@ public class Commit {
     public GitRepository getRepo() { return repo; }
     public String getTreeSha() { return treeSha; }
     public String getParentSha() { return parentSha; }
+    public String setSecondParentSha(){return secondParentSha;}
     public User getAuthor() { return author; }
     public String getMessage() { return message; }
     public LocalDateTime getTimestamp() { return timestamp; }
@@ -74,4 +75,8 @@ public class Commit {
     public void setAuthor(User author) { this.author = author; }
     public void setMessage(String message) { this.message = message; }
     public void setCommitSha(String commitSha){this.commitSha=commitSha;}
+
+    public String getSecondParentSha() {
+        return this.secondParentSha;
+    }
 }
