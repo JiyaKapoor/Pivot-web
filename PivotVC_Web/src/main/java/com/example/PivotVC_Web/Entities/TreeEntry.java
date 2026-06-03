@@ -26,8 +26,7 @@ public class TreeEntry {
 
     public TreeEntry() {}
 
-    public TreeEntry(TreeNode treeNode, String name, EntryType type, String sha) {
-        this.treeNode = treeNode;
+    public TreeEntry(String name, EntryType type, String sha) {
         this.name = name;
         this.type = type;
         this.sha = sha;
@@ -48,8 +47,10 @@ public class TreeEntry {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TreeEntry)) return false;
-        TreeEntry e = (TreeEntry) o;
-        return Objects.equals(name, e.name);
+
+        TreeEntry other = (TreeEntry) o;
+
+        return Objects.equals(name, other.name);
     }
 
     @Override

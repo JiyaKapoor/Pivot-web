@@ -17,6 +17,9 @@ public class Commit {
     @JoinColumn(name = "repo_id", nullable = false)
     private GitRepository repo;
 
+    @Column(unique=true)
+    private String commitSha;
+
     @Column(name = "tree_sha", nullable = false)
     private String treeSha;
 
@@ -43,14 +46,14 @@ public class Commit {
 
     public Commit() {}
 
-    public Commit(String sha, GitRepository repo, String treeSha, String parentSha,String secondParentSha, User author, String message) {
-        this.sha = sha;
+    public Commit(GitRepository repo, String treeSha, String parentSha,String secondParentSha, User author, String message) {
         this.repo = repo;
         this.treeSha = treeSha;
         this.parentSha = parentSha;
         this.secondParentSha=secondParentSha;
         this.author = author;
         this.message = message;
+
     }
 
     public Long getId() { return id; }
@@ -70,4 +73,5 @@ public class Commit {
     public void setParentSha(String parentSha) { this.parentSha = parentSha; }
     public void setAuthor(User author) { this.author = author; }
     public void setMessage(String message) { this.message = message; }
+    public void setCommitSha(String commitSha){this.commitSha=commitSha;}
 }

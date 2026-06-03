@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface HeadRepository extends JpaRepository<Head,Long>{
+    Head findByRepoId(Long repoId);
 }

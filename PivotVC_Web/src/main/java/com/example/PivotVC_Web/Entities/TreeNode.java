@@ -23,8 +23,8 @@ public class TreeNode {
 
     public TreeNode() {}
 
-    public TreeNode(String sha, Long repoId) {
-        this.sha = sha;
+    public TreeNode(Long repoId,List<TreeEntry> entries) {
+        this.entries = entries;
         this.repoId = repoId;
     }
 

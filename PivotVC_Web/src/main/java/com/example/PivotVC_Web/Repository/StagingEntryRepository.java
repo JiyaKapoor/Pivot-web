@@ -6,9 +6,12 @@ import com.example.PivotVC_Web.Entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface StagingEntryRepository extends JpaRepository<StagingEntry, Long> {
     Optional<StagingEntry> findByRepoAndUserAndFilePath(GitRepository repo, User user, String filePath);
+
+    List<StagingEntry> findByRepoAndUser(GitRepository gitRepository, User user);
 }
