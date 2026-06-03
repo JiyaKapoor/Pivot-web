@@ -15,6 +15,10 @@ public class BranchService {
     BranchRepository branchRepository;
     public void createBranch(GitRepository repo,String branchName){
         //we need to find the current commit
+        if(branchRepository.findByBranchName(branchName)!=null){
+            System.out.println("Branch already exists");
+            return;
+        }
         String currCommit;
         Head head=headRepository.findByRepoId(repo.getId());
         if(head.getRefType()== RefType.DETACHED){
