@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "repositories")
-public class Repository {
+public class GitRepository  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,9 +32,9 @@ public class Repository {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Repository() {}
+    public GitRepository() {}
 
-    public Repository(String name, User owner, boolean isPrivate) {
+    public GitRepository(String name, User owner, boolean isPrivate) {
         this.name = name;
         this.owner = owner;
         this.isPrivate = isPrivate;

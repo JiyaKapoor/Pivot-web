@@ -12,7 +12,7 @@ public class Branch {
 
     @ManyToOne
     @JoinColumn(name = "repo_id", nullable = false)
-    private Repository repo;
+    private GitRepository repo;
 
     @Column(nullable = false)
     private String name;
@@ -39,20 +39,20 @@ public class Branch {
 
     public Branch() {}
 
-    public Branch(Repository repo, String name, String headCommitSha) {
+    public Branch(GitRepository repo, String name, String headCommitSha) {
         this.repo = repo;
         this.name = name;
         this.headCommitSha = headCommitSha;
     }
 
     public Long getId() { return id; }
-    public Repository getRepo() { return repo; }
+    public GitRepository getRepo() { return repo; }
     public String getName() { return name; }
     public String getHeadCommitSha() { return headCommitSha; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 
     public void setName(String name) { this.name = name; }
-    public void setRepo(Repository repo) { this.repo = repo; }
+    public void setRepo(GitRepository repo) { this.repo = repo; }
     public void setHeadCommitSha(String headCommitSha) { this.headCommitSha = headCommitSha; }
 }

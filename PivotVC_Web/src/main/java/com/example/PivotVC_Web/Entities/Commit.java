@@ -15,7 +15,7 @@ public class Commit {
 
     @ManyToOne
     @JoinColumn(name = "repo_id", nullable = false)
-    private Repository repo;
+    private GitRepository repo;
 
     @Column(name = "tree_sha", nullable = false)
     private String treeSha;
@@ -43,7 +43,7 @@ public class Commit {
 
     public Commit() {}
 
-    public Commit(String sha, Repository repo, String treeSha, String parentSha,String secondParentSha, User author, String message) {
+    public Commit(String sha, GitRepository repo, String treeSha, String parentSha,String secondParentSha, User author, String message) {
         this.sha = sha;
         this.repo = repo;
         this.treeSha = treeSha;
@@ -55,7 +55,7 @@ public class Commit {
 
     public Long getId() { return id; }
     public String getSha() { return sha; }
-    public Repository getRepo() { return repo; }
+    public GitRepository getRepo() { return repo; }
     public String getTreeSha() { return treeSha; }
     public String getParentSha() { return parentSha; }
     public User getAuthor() { return author; }
@@ -65,7 +65,7 @@ public class Commit {
         return secondParentSha != null;
     }
     public void setSha(String sha) { this.sha = sha; }
-    public void setRepo(Repository repo) { this.repo = repo; }
+    public void setRepo(GitRepository repo) { this.repo = repo; }
     public void setTreeSha(String treeSha) { this.treeSha = treeSha; }
     public void setParentSha(String parentSha) { this.parentSha = parentSha; }
     public void setAuthor(User author) { this.author = author; }

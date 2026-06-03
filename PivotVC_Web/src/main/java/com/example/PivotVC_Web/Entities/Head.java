@@ -5,7 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
 import java.sql.Ref;
-
+@Entity
 public class Head {
     @Id
     @GeneratedValue
