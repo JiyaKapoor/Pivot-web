@@ -22,7 +22,7 @@ public class InitService {
     private HeadRepository headRepository;
 
     @Transactional
-    public GitRepository initRepo(String repoName, String description, boolean isPrivate, User owner) {
+    public GitRepository initRepo(String repoName, boolean isPrivate, User owner) {
 
         if (repoRepository.existsByOwnerAndName(owner, repoName)) {
             throw new IllegalArgumentException("Repository '" + repoName + "' already exists for user " + owner.getUsername());

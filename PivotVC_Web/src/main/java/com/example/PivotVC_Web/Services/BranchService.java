@@ -8,6 +8,8 @@ import com.example.PivotVC_Web.Repository.BranchRepository;
 import com.example.PivotVC_Web.Repository.HeadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 public class BranchService {
     @Autowired
     HeadRepository headRepository;
@@ -44,5 +46,9 @@ public class BranchService {
             head.setBranchName(branchName);
             headRepository.save(head);
         }
+    }
+    public List<Branch> listBranches(GitRepository gitRepository){
+        List<Branch> branches=branchRepository.findByRepo(gitRepository);
+        return branches;
     }
 }
