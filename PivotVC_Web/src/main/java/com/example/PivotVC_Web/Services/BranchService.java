@@ -7,9 +7,10 @@ import com.example.PivotVC_Web.Entities.RefType;
 import com.example.PivotVC_Web.Repository.BranchRepository;
 import com.example.PivotVC_Web.Repository.HeadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
 public class BranchService {
     @Autowired
     HeadRepository headRepository;
@@ -17,7 +18,7 @@ public class BranchService {
     BranchRepository branchRepository;
     public void createBranch(GitRepository repo,String branchName){
         //we need to find the current commit
-        if(branchRepository.findByBranchName(branchName)!=null){
+        if(branchRepository.findByName(branchName)!=null){
             System.out.println("Branch already exists");
             return;
         }
@@ -27,14 +28,14 @@ public class BranchService {
             currCommit=head.getCommitSha();
         }
         else{
-            Branch branch=branchRepository.findByBranchName(head.getBranchName());
+            Branch branch=branchRepository.findByName(head.getBranchName());
             currCommit=branch.getHeadCommitSha();
         }
         Branch branch=new Branch(repo,branchName,currCommit);
         branchRepository.save(branch);
     }
     public void checkOut(String branchName,GitRepository gitRepository){
-        Branch branch=branchRepository.findByBranchName(branchName);
+        Branch branch=branchRepository.findByName(branchName);
         //we need to update headd
         Head head=headRepository.findByRepoId(gitRepository.getId());
         if(head.getRefType()==RefType.DETACHED){

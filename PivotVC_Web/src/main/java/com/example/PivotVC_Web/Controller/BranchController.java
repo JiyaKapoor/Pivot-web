@@ -12,19 +12,19 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/branch")
+@RequestMapping("/repo")
 public class BranchController {
     @Autowired
     private RepoRepository repoRepository;
     @Autowired
     private BranchService branchService;
-    @PostMapping("/create")
+    @PostMapping("/create-branch")
     public ResponseEntity<String> createBranch(@RequestParam String branchName, @RequestParam Long repoId){
         GitRepository gitRepository=repoRepository.findById(repoId).orElseThrow(()-> new RuntimeException("Repository not found"));
         branchService.createBranch(gitRepository,branchName);
         return ResponseEntity.ok("Repository created");
     }
-    @GetMapping("/checkout")
+    @GetMapping("/checkout-branch")
     public ResponseEntity<String> checkout(@RequestParam Long repoId,@RequestParam String branchName){
         GitRepository gitRepository=repoRepository.findById(repoId).orElseThrow(()-> new RuntimeException());
         branchService.checkOut(branchName,gitRepository);

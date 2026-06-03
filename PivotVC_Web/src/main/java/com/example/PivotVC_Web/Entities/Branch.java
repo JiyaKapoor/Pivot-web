@@ -17,7 +17,7 @@ public class Branch {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "head_commit_sha", nullable = false)
+    @Column(name = "head_commit_sha", nullable = true)
     private String headCommitSha;
 
     @Column(updatable = false)

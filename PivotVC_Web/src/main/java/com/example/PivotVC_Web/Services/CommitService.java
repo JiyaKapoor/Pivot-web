@@ -32,7 +32,7 @@ public class CommitService {
         if(head.getRefType()==RefType.DETACHED)commitSha=head.getCommitSha();
         else{
             String branchName=head.getBranchName();
-            Branch branch=branchRepository.findByBranchName(branchName);
+            Branch branch=branchRepository.findByName(branchName);
             commitSha=branch.getHeadCommitSha();
         }
         //now we load the current tree using this commitSha
@@ -83,7 +83,7 @@ public class CommitService {
         }
         else{
             String branchName=head.getBranchName();
-            Branch branch=branchRepository.findByBranchName(branchName);
+            Branch branch=branchRepository.findByName(branchName);
             branch.setHeadCommitSha(newCommitSha);
             branchRepository.save(branch);
         }
@@ -98,7 +98,7 @@ public class CommitService {
         }
         else{
             String branchName=head.getBranchName();
-            Branch branch=branchRepository.findByBranchName(branchName);
+            Branch branch=branchRepository.findByName(branchName);
             currCommit=branch.getHeadCommitSha();
         }
         if(currCommit == null){

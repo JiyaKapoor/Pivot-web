@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface BranchRepository extends JpaRepository<Branch,Long> {
-    Branch findByBranchName(String branchName);
+    Branch findByName(String branchName);
 
     List<Branch> findByRepo(GitRepository repo);
 }
