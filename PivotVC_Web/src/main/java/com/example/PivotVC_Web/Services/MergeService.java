@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 @Service
@@ -108,7 +109,7 @@ public class MergeService {
         // deleted files are simply not added to mergedFiles
 
         // now persist and return new commit sha
-        return persistMergeResult(mergedFiles, shaA, shaB, repoId,userId);
+        return persistMergeResult(mergedFiles, shaA, shaB, repoId,userId,branchB);
     }
     private ShaComparisonResult compareBySha(Set<String> allPaths,
                                              Map<String, String> baseMap,
@@ -201,7 +202,7 @@ public class MergeService {
         return idx < lines.size() ? lines.get(idx) : null;
     }
     private String persistMergeResult(Map<String, byte[]> mergedFiles,
-                                      String shaA, String shaB, Long repoId,Long userId){
+                                      String shaA, String shaB, Long repoId,Long userId,String targetBranchName){
         // Step 1: upload each file as a blob if it doesn't exist
         Set<TreeEntry> entries = new HashSet<>();
         for (Map.Entry<String, byte[]> e : mergedFiles.entrySet()) {
@@ -253,6 +254,20 @@ public class MergeService {
         mergeCommit.setRepo(repository);
         mergeCommit.setAuthor(author);
         commitRepository.save(mergeCommit);
+        Branch targetBranch = branchRepository.findByRepoAndName(repository,targetBranchName);
+        targetBranch.setHeadCommitSha(commitSha);
+        branchRepository.save(targetBranch);
+
+        // Step 5: upload commit object to Supabase so file viewer works
+        String commitContent = treeSha + "\n" + shaA + "\n" + "Merge commit\n" + author.getUsername() + "\n" + LocalDateTime.now();
+        supabaseStorageService.upload("repos/" + repoId + "/commit/" + commitSha, commitContent.getBytes(StandardCharsets.UTF_8));
+
+        // Step 6: upload tree object to Supabase
+        StringBuilder sb = new StringBuilder();
+        entries.stream()
+                .sorted(Comparator.comparing(TreeEntry::getName))
+                .forEach(entry -> sb.append("BLOB ").append(entry.getSha()).append(" ").append(entry.getName()).append("\n"));
+        supabaseStorageService.upload("repos/" + repoId + "/trees/" + treeSha, sb.toString().getBytes(StandardCharsets.UTF_8));
         return commitSha;
     }
 }
