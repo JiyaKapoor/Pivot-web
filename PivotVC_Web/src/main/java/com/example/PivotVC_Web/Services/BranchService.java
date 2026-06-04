@@ -18,7 +18,7 @@ public class BranchService {
     BranchRepository branchRepository;
     public void createBranch(GitRepository repo,String branchName){
         //we need to find the current commit
-        if(branchRepository.findByName(branchName)!=null){
+        if(branchRepository.findByRepoAndName(repo,branchName)!=null){
             System.out.println("Branch already exists");
             return;
         }
@@ -28,7 +28,7 @@ public class BranchService {
             currCommit=head.getCommitSha();
         }
         else{
-            Branch branch=branchRepository.findByName(head.getBranchName());
+            Branch branch=branchRepository.findByRepoAndName(repo,head.getBranchName());
             currCommit=branch.getHeadCommitSha();
         }
         Branch branch=new Branch(repo,branchName,currCommit);

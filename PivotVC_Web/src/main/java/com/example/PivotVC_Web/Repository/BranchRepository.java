@@ -11,5 +11,7 @@ import java.util.List;
 public interface BranchRepository extends JpaRepository<Branch,Long> {
     Branch findByName(String branchName);
     Branch findByRepoAndName(GitRepository repo,String branchName);
-    List<Branch> findByRepo(GitRepository repo);
+
+
+    List<Branch> findByRepo(GitRepository gitRepository);
 }
