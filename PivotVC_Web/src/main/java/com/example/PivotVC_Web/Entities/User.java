@@ -1,9 +1,10 @@
 package com.example.PivotVC_Web.Entities;
 
 import jakarta.persistence.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.time.LocalDateTime;
-
+@CrossOrigin(origins = "http://localhost:5173")
 @Entity
 @Table(name = "users")
 public class User {

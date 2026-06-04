@@ -3,13 +3,10 @@ package com.example.PivotVC_Web.Controller;
 import com.example.PivotVC_Web.Entities.User;
 import com.example.PivotVC_Web.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
-
+@CrossOrigin(origins="*")
 @RestController
 @RequestMapping("/repo")
 public class UserController{
@@ -24,6 +21,8 @@ public class UserController{
     public boolean login(@RequestParam String email,@RequestParam String password){
         Optional<User> user=userRepository.findByEmail(email);
         if(user.isEmpty())return false;
+        System.out.println("Input password = " + password);
+        System.out.println("DB password = " + user.get().getPasswordHash());
         return user.get().getPasswordHash().equals(password);
     }
 }
