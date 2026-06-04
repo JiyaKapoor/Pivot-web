@@ -33,12 +33,5 @@ public class RepoController {
         initService.initRepo(repoName,isPrivate,user);
         return ResponseEntity.ok("Repository created successfully");
     }
-    @PostMapping("/stageFile")
-    public ResponseEntity<String> stageFile(@RequestParam Long repoId,@RequestParam Long userId,@RequestParam String filePath,@RequestParam MultipartFile file) throws IOException {
-        byte[] content=file.getBytes();
-        GitRepository gitRepository=repoRepository.findById(repoId).orElseThrow(()->new RuntimeException());
-        User user=userRepository.findById(userId).orElseThrow(()-> new RuntimeException());
-        stagingAreaService.stageFile(gitRepository,user,filePath,content);
-        return ResponseEntity.ok("File staged");
-    }
+
 }
