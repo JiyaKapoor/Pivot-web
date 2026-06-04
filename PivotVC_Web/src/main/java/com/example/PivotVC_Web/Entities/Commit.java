@@ -59,7 +59,7 @@ public class Commit {
     public GitRepository getRepo() { return repo; }
     public String getTreeSha() { return treeSha; }
     public String getParentSha() { return parentSha; }
-    public String setSecondParentSha(){return secondParentSha;}
+    public void setSecondParentSha(String sha){this.secondParentSha=secondParentSha;}
     public User getAuthor() { return author; }
     public String getMessage() { return message; }
     public LocalDateTime getTimestamp() { return timestamp; }

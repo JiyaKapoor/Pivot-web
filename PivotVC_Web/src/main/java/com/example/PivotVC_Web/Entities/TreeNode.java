@@ -2,7 +2,9 @@ package com.example.PivotVC_Web.Entities;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "tree_nodes")
@@ -43,5 +45,13 @@ public class TreeNode {
 
     public void removeEntry(TreeEntry entry) {
         entries.remove(entry);
+    }
+
+    public Map<String, String> toMap() {
+        Map<String, String> map = new HashMap<>();
+        for (TreeEntry entry : this.getEntries()) {
+            map.put(entry.getName(), entry.getSha()); // name is already the full path
+        }
+        return map;
     }
 }

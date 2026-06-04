@@ -2,6 +2,7 @@ package com.example.PivotVC_Web.Services;
 
 import com.example.PivotVC_Web.Entities.*;
 import com.example.PivotVC_Web.Repository.CommitRepository;
+import com.example.PivotVC_Web.Repository.GitObjectRepository;
 import com.example.PivotVC_Web.Repository.TreeNodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,10 @@ public class TreeService {
     private CommitRepository commitRepository;
     @Autowired
     private TreeNodeRepository treeNodeRepository;
+    @Autowired
+    private GitObjectRepository gitObjectRepository;
+    @Autowired
+    private SupabaseStorageService supabaseStorageService;
 
     public Set<TreeEntry> buildTreeAdd(String currCommit,String filePath,String blobSha) {
         Commit commit=commitRepository.findBySha(currCommit);
@@ -27,6 +32,12 @@ public class TreeService {
             entries.add(new TreeEntry(e.getKey(),EntryType.BLOB,e.getValue()));
         }
         return entries;
+    }
+    public TreeNode buildTree(String currCommit, Long repoId){
+        //we need to fetch the tree at a particular commit
+        Commit commit = commitRepository.findBySha(currCommit);
+        if (commit == null) return null;
+        return treeNodeRepository.findBySha(commit.getTreeSha());
     }
     public void flattenTree(String treeSha,String currPath,HashMap<String,String> map){
         TreeNode tree=treeNodeRepository.findBySha(treeSha);
