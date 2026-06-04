@@ -44,7 +44,6 @@ public class MergeService {
         }
         return parentCommits;
     }
-
     public String findCommonAncestor(String shaA, String shaB) {
         HashSet<String> ancestors = collectAncestors(shaA);
         HashSet<String> visited = new HashSet<>();
@@ -68,6 +67,8 @@ public class MergeService {
         String shaA=branchRepository.findByRepoAndName(repo,branchA).getHeadCommitSha();
         String shaB=branchRepository.findByRepoAndName(repo,branchB).getHeadCommitSha();
         String baseSha = findCommonAncestor(shaA, shaB);
+        if (shaA.equals(baseSha)) return shaB;
+        if (shaB.equals(baseSha)) return shaA;
         // get flat maps
         HashMap<String, String> baseMap   = new HashMap<>();
         HashMap<String, String> sourceMap = new HashMap<>();
