@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/repo")
 public class RepoController {
@@ -39,5 +39,4 @@ public class RepoController {
         List<GitRepository> currRepos=repoRepository.findByOwner(user);
         return ResponseEntity.ok(currRepos);
     }
-
 }

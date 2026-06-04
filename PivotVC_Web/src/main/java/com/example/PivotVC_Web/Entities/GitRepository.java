@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "repositories")
 public class GitRepository  {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
