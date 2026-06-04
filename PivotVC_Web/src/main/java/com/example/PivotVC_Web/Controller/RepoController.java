@@ -33,5 +33,11 @@ public class RepoController {
         initService.initRepo(repoName,isPrivate,user);
         return ResponseEntity.ok("Repository created successfully");
     }
+    @GetMapping("/listRepos")
+    public ResponseEntity<List<GitRepository>> listRepositories(@RequestParam Long userId){
+        User user=userRepository.findById(userId).orElseThrow();
+        List<GitRepository> currRepos=repoRepository.findByOwner(user);
+        return ResponseEntity.ok(currRepos);
+    }
 
 }
