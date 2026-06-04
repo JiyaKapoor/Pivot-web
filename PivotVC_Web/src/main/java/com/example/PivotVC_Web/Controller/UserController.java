@@ -3,6 +3,8 @@ package com.example.PivotVC_Web.Controller;
 import com.example.PivotVC_Web.Entities.User;
 import com.example.PivotVC_Web.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -18,11 +20,16 @@ public class UserController{
         userRepository.save(user);
     }
     @PostMapping("/login")
-    public boolean login(@RequestParam String email,@RequestParam String password){
-        Optional<User> user=userRepository.findByEmail(email);
-        if(user.isEmpty())return false;
-        System.out.println("Input password = " + password);
-        System.out.println("DB password = " + user.get().getPasswordHash());
-        return user.get().getPasswordHash().equals(password);
+    public ResponseEntity<Long> login(
+            @RequestParam String email,
+            @RequestParam String password) {
+
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+        if (user == null || !user.getPasswordHash().equals(password)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok(user.getId());
     }
 }

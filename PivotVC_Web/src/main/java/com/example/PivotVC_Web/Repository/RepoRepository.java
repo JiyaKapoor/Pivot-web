@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface RepoRepository extends JpaRepository<GitRepository,Long> {
     boolean existsByOwnerAndName(User owner, String name);
+    GitRepository findByOwnerAndId(User user, Long repoId);
 
     List<GitRepository> findByOwner(User user);
 }
