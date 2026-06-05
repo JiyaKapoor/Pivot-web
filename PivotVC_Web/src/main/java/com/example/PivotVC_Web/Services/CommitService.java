@@ -28,7 +28,7 @@ public class CommitService {
     @Autowired
     SupabaseStorageService supabaseStorageService;
     @Transactional
-    public void commitAdd(GitRepository gitRepository,User user,String message,String filePath,byte[] fileContent){
+    public String commitAdd(GitRepository gitRepository,User user,String message,String filePath,byte[] fileContent){
         Head head=headRepository.findByRepoId(gitRepository.getId());
         String commitSha;
         if(head.getRefType()==RefType.DETACHED)commitSha=head.getCommitSha();
@@ -107,6 +107,7 @@ public class CommitService {
             branch.setHeadCommitSha(newCommitSha);
             branchRepository.save(branch);
         }
+        return newCommitSha;
     }
     public List<Commit> log(GitRepository gitRepository){
         //prints the commit history of whichever brnach we are on

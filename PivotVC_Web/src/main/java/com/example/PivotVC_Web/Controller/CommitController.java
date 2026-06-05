@@ -2,10 +2,13 @@ package com.example.PivotVC_Web.Controller;
 
 import com.example.PivotVC_Web.Entities.Commit;
 import com.example.PivotVC_Web.Entities.GitRepository;
+import com.example.PivotVC_Web.Entities.Head;
 import com.example.PivotVC_Web.Entities.User;
 import com.example.PivotVC_Web.Repository.CommitRepository;
+import com.example.PivotVC_Web.Repository.HeadRepository;
 import com.example.PivotVC_Web.Repository.RepoRepository;
 import com.example.PivotVC_Web.Repository.UserRepository;
+import com.example.PivotVC_Web.Services.AgentService;
 import com.example.PivotVC_Web.Services.CommitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,22 +26,34 @@ public class CommitController {
     private RepoRepository repoRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AgentService agentService;
+    @Autowired
+    private HeadRepository headRepository;
     @PostMapping("/commit")
     public ResponseEntity<String> commit(@RequestParam Long repoId, @RequestParam Long userId, @RequestParam String message,@RequestParam String filePath,
                                          @RequestParam MultipartFile file){
         GitRepository gitRepository=repoRepository.findById(repoId).orElseThrow(()-> new RuntimeException());
         User user=userRepository.findById(userId).orElseThrow(()->new RuntimeException());
         try {
-            commitService.commitAdd(
+            String commitSha=commitService.commitAdd(
                     gitRepository,
                     user,
                     message,
                     filePath,
                     file.getBytes()
             );
+            Head head=headRepository.findByRepoId(gitRepository.getId());
+            agentService.triggerAnalysis(
+                    gitRepository.getId(),
+                    commitSha,
+                    head.getBranchName(),
+                    false
+            );
         } catch (Exception e) {
             throw new RuntimeException("Commit failed", e);
         }
+
 
         return ResponseEntity.ok("Commit successful");
     }
