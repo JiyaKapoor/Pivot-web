@@ -5,16 +5,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 @Entity
-@Table(name = "tree_nodes")
+@Table(name = "tree_nodes", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"sha", "repo_id"})
+})
 public class TreeNode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String sha;
 
     @Column(name = "repo_id", nullable = false)

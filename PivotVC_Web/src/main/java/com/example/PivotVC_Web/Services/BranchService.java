@@ -35,7 +35,7 @@ public class BranchService {
         branchRepository.save(branch);
     }
     public void checkOut(String branchName,GitRepository gitRepository){
-        Branch branch=branchRepository.findByName(branchName);
+        Branch branch=branchRepository.findByRepoAndName(gitRepository, branchName);
         //we need to update headd
         Head head=headRepository.findByRepoId(gitRepository.getId());
         if(head.getRefType()==RefType.DETACHED){

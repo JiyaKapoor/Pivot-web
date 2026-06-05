@@ -64,6 +64,8 @@ public class CommitService {
 
         String treeSha = ComputeSha.computeBlobSha(sb.toString().getBytes());
         node.setSha(treeSha);
+        System.out.println("entries count before save: " + entries.size());
+        entries.forEach(e -> System.out.println("  -> " + e.getName() + " | " + e.getSha()));
         treeNodeRepository.save(node);
         String treePath="repos/"+gitRepository.getId()+"/trees/"+treeSha;
         Long size=(long)sb.toString().getBytes().length;

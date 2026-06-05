@@ -24,7 +24,7 @@ public class BranchController {
         branchService.createBranch(gitRepository,branchName);
         return ResponseEntity.ok("Repository created");
     }
-    @GetMapping("/checkout-branch")
+    @PostMapping("/checkout-branch")
     public ResponseEntity<String> checkout(@RequestParam Long repoId,@RequestParam String branchName){
         GitRepository gitRepository=repoRepository.findById(repoId).orElseThrow(()-> new RuntimeException());
         branchService.checkOut(branchName,gitRepository);
