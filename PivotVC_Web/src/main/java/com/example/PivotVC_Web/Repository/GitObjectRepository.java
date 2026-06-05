@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface GitObjectRepository extends JpaRepository<GitObject, Long> {
-    boolean existsBySha(String sha);
+    boolean existsByShaAndRepoId(String sha,Long repoId);
     Optional<GitObject> findByShaAndRepoId(String sha, Long repoId);
 }

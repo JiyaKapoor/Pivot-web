@@ -212,7 +212,7 @@ public class MergeService {
             String blobSha  = ComputeSha.computeBlobSha(content);
             String blobPath = "repos/" + repoId + "/blob/" + blobSha;
 
-            if (!gitObjectRepository.existsBySha(blobSha)) {
+            if (!gitObjectRepository.existsByShaAndRepoId(blobSha,repoId)) {
                 GitObject blobObject = new GitObject(blobSha, repoId,
                         GitObject.ObjectType.BLOB, blobPath, (long) content.length);
                 gitObjectRepository.save(blobObject);
@@ -237,7 +237,7 @@ public class MergeService {
         String treePath = "repos/" + repoId + "/tree/" + treeSha;
         GitObject treeObject = new GitObject(treeSha, repoId,
                 GitObject.ObjectType.TREE, treePath, 0L);
-        if (!gitObjectRepository.existsBySha(treeSha)) {
+        if (!gitObjectRepository.existsByShaAndRepoId(treeSha,repoId)) {
             gitObjectRepository.save(treeObject);
         }
         User author=userRepository.findById(userId).orElseThrow();

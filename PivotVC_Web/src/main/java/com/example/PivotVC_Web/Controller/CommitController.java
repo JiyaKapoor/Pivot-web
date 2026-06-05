@@ -53,8 +53,6 @@ public class CommitController {
         } catch (Exception e) {
             throw new RuntimeException("Commit failed", e);
         }
-
-
         return ResponseEntity.ok("Commit successful");
     }
     @GetMapping("/commit-log")

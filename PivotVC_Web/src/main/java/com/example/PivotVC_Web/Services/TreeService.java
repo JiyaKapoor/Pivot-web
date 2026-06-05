@@ -1,12 +1,11 @@
 package com.example.PivotVC_Web.Services;
 
 import com.example.PivotVC_Web.Entities.*;
-import com.example.PivotVC_Web.Repository.CommitRepository;
-import com.example.PivotVC_Web.Repository.GitObjectRepository;
-import com.example.PivotVC_Web.Repository.TreeNodeRepository;
+import com.example.PivotVC_Web.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 @Service
 public class TreeService {
@@ -18,7 +17,10 @@ public class TreeService {
     private GitObjectRepository gitObjectRepository;
     @Autowired
     private SupabaseStorageService supabaseStorageService;
-
+    @Autowired
+    private BranchRepository branchRepository;
+    @Autowired
+    private RepoRepository repoRepository;
     public Set<TreeEntry> buildTreeAdd(String currCommit,String filePath,String blobSha) {
         Commit commit=commitRepository.findBySha(currCommit);
         HashMap<String,String> map=new HashMap<>();
@@ -50,5 +52,76 @@ public class TreeService {
                 flattenTree(entry.getSha(),fullPath,map);
             }
         }
+    }
+    public void flattenTreeWithContent(
+            String treeSha,
+            String currPath,
+            Map<String,String> map,
+            Long repoId
+    ) {
+
+        TreeNode tree = treeNodeRepository.findBySha(treeSha);
+
+        if(tree == null) {
+            return;
+        }
+
+        for(TreeEntry entry : tree.getEntries()) {
+
+            String fullPath = currPath.isEmpty()
+                    ? entry.getName()
+                    : currPath + "/" + entry.getName();
+
+            if(entry.getType() == EntryType.BLOB) {
+
+                GitObject blob = gitObjectRepository.findByShaAndRepoId(entry.getSha(),repoId).orElseThrow();
+
+                if(blob != null) {
+
+                    byte[] data = supabaseStorageService.download(
+                            blob.getStoragePath()
+                    );
+
+                    String content = new String(
+                            data,
+                            StandardCharsets.UTF_8
+                    );
+
+                    map.put(fullPath, content);
+                }
+            } else {
+
+                flattenTreeWithContent(
+                        entry.getSha(),
+                        fullPath,
+                        map,
+                        repoId
+                );
+            }
+        }
+    }
+    public Map<String,String> loadBranches(Long repoId,String branchName){
+            GitRepository repo=repoRepository.findById(repoId).orElseThrow();
+            Branch branch =
+                    branchRepository.findByRepoAndName(
+                            repo,
+                            branchName
+                    );
+
+            Commit commit =
+                    commitRepository.findBySha(
+                            branch.getHeadCommitSha()
+                    );
+
+            Map<String,String> files = new HashMap<>();
+
+            flattenTreeWithContent(
+                    commit.getTreeSha(),
+                    "",
+                    files,
+                    repoId
+            );
+
+            return files;
     }
 }

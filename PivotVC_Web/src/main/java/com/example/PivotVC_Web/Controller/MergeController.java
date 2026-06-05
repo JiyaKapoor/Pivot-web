@@ -1,6 +1,7 @@
 package com.example.PivotVC_Web.Controller;
 
 import com.example.PivotVC_Web.Entities.Commit;
+import com.example.PivotVC_Web.Services.AgentService;
 import com.example.PivotVC_Web.Services.MergeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +14,24 @@ import java.io.IOException;
 public class MergeController {
     @Autowired
     private MergeService mergeService;
+    @Autowired
+    private AgentService agentService;
     @PostMapping("/merge")
     public ResponseEntity<String> mergeRequest(@RequestParam Long userId,@RequestParam Long repoId,@RequestParam String branchNameA,@RequestParam String branchNameB) throws IOException {
         mergeService.threeWayMerge(branchNameA,branchNameB,repoId,userId);
         return ResponseEntity.ok("merge successful");
+    }
+    @GetMapping("/merge-analysis")
+    public String analyzeMerge(
+            @RequestParam Long repoId,
+            @RequestParam String sourceBranch,
+            @RequestParam String targetBranch
+    ) {
+
+        return agentService.runMergeSafetyCheck(
+                repoId,
+                sourceBranch,
+                targetBranch
+        );
     }
 }

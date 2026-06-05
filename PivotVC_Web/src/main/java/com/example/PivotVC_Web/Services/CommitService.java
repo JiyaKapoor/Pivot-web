@@ -39,7 +39,7 @@ public class CommitService {
         }
         String blobSha=ComputeSha.computeBlobSha(fileContent);
         // Add this after computing blobSha
-        if (!gitObjectRepository.existsBySha(blobSha)) {
+        if (!gitObjectRepository.existsByShaAndRepoId(blobSha, gitRepository.getId())) {
             String blobPath = "repos/" + gitRepository.getId() + "/blob/"
                     +blobSha;
             GitObject blobObject = new GitObject(blobSha, gitRepository.getId(),

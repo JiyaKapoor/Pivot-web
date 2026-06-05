@@ -17,8 +17,7 @@ public class AgentAnalysis {
     @Column(columnDefinition = "TEXT")
     private String codeReview;
 
-    @Column(columnDefinition = "TEXT")
-    private String suggestedCommitMessage;
+    private boolean isMergeEvent;
 
     @Column(columnDefinition = "TEXT")
     private String branchSummary;
@@ -33,7 +32,6 @@ public class AgentAnalysis {
     public String getCommitSha() { return commitSha; }
     public String getBranchName() { return branchName; }
     public String getCodeReview() { return codeReview; }
-    public String getSuggestedCommitMessage() { return suggestedCommitMessage; }
     public String getBranchSummary() { return branchSummary; }
     public String getSafetyReport() { return safetyReport; }
     public LocalDateTime getCreatedAt() { return createdAt; }
@@ -42,8 +40,9 @@ public class AgentAnalysis {
     public void setCommitSha(String commitSha) { this.commitSha = commitSha; }
     public void setBranchName(String branchName) { this.branchName = branchName; }
     public void setCodeReview(String codeReview) { this.codeReview = codeReview; }
-    public void setSuggestedCommitMessage(String suggestedCommitMessage) { this.suggestedCommitMessage = suggestedCommitMessage; }
     public void setBranchSummary(String branchSummary) { this.branchSummary = branchSummary; }
     public void setSafetyReport(String safetyReport) { this.safetyReport = safetyReport; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setMergeEvent(boolean isMergeEvent){ this.isMergeEvent=isMergeEvent;}
+    public boolean getMergeEvent(){return this.isMergeEvent;}
 }
