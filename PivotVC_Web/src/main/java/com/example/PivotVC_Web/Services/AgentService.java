@@ -1,6 +1,7 @@
 package com.example.PivotVC_Web.Services;
 
 import com.example.PivotVC_Web.Entities.AgentAnalysis;
+import com.example.PivotVC_Web.Entities.FileIndexDTO;
 import com.example.PivotVC_Web.Repository.AgentAnalysisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -78,5 +81,30 @@ public class AgentService {
                 );
 
         return (String) response.getBody().get("safety_report");
+    }
+    public void indexRepository(
+            Long repoId,
+            String branchName
+    ) {
+
+        List<FileIndexDTO> files =
+                treeService.loadBranchFiles(
+                        repoId,
+                        branchName
+                );
+
+        Map<String,Object> body = new HashMap<>();
+
+        body.put("repo_id", repoId.toString());
+        body.put("files", files);
+
+        RestTemplate restTemplate =
+                new RestTemplate();
+
+        restTemplate.postForEntity(
+                "http://localhost:8000/index-repo",
+                body,
+                Map.class
+        );
     }
 }

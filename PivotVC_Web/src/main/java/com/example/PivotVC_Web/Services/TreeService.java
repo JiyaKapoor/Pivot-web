@@ -100,6 +100,63 @@ public class TreeService {
             }
         }
     }
+    public void flattenTreeForIndexing(
+            String treeSha,
+            String currPath,
+            List<FileIndexDTO> files,
+            Long repoId
+    ) {
+
+        TreeNode tree = treeNodeRepository.findBySha(treeSha);
+
+        if (tree == null) {
+            return;
+        }
+
+        for (TreeEntry entry : tree.getEntries()) {
+
+            String fullPath = currPath.isEmpty()
+                    ? entry.getName()
+                    : currPath + "/" + entry.getName();
+
+            if (entry.getType() == EntryType.BLOB) {
+
+                GitObject blob =
+                        gitObjectRepository
+                                .findByShaAndRepoId(entry.getSha(), repoId)
+                                .orElse(null);
+
+                if (blob == null) {
+                    continue;
+                }
+
+                byte[] data =
+                        supabaseStorageService.download(
+                                blob.getStoragePath()
+                        );
+
+                String content =
+                        new String(data, StandardCharsets.UTF_8);
+
+                files.add(
+                        new FileIndexDTO(
+                                fullPath,
+                                entry.getSha(),
+                                content
+                        )
+                );
+
+            } else {
+
+                flattenTreeForIndexing(
+                        entry.getSha(),
+                        fullPath,
+                        files,
+                        repoId
+                );
+            }
+        }
+    }
     public Map<String,String> loadBranches(Long repoId,String branchName){
             GitRepository repo=repoRepository.findById(repoId).orElseThrow();
             Branch branch =
@@ -123,5 +180,40 @@ public class TreeService {
             );
 
             return files;
+    }
+    public List<FileIndexDTO> loadBranchFiles(
+            Long repoId,
+            String branchName
+    ) {
+
+        GitRepository repo =
+                repoRepository.findById(repoId)
+                        .orElseThrow();
+
+        Branch branch =
+                branchRepository.findByRepoAndName(
+                        repo,
+                        branchName
+                );
+
+        Commit commit =
+                commitRepository.findBySha(
+                        branch.getHeadCommitSha()
+                );
+
+        if (commit == null) {
+            return Collections.emptyList();
+        }
+
+        List<FileIndexDTO> files = new ArrayList<>();
+
+        flattenTreeForIndexing(
+                commit.getTreeSha(),
+                "",
+                files,
+                repoId
+        );
+
+        return files;
     }
 }

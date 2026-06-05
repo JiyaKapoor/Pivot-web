@@ -44,12 +44,14 @@ public class CommitController {
                     file.getBytes()
             );
             Head head=headRepository.findByRepoId(gitRepository.getId());
+            String branchName=head.getBranchName();
             agentService.triggerAnalysis(
                     gitRepository.getId(),
                     commitSha,
                     head.getBranchName(),
                     false
             );
+            agentService.indexRepository(repoId,branchName);
         } catch (Exception e) {
             throw new RuntimeException("Commit failed", e);
         }
