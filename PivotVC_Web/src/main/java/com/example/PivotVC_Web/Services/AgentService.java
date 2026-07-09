@@ -97,6 +97,7 @@ public class AgentService {
 
         body.put("repo_id", repoId.toString());
         body.put("files", files);
+        body.put("branchName",branchName);
 
         RestTemplate restTemplate =
                 new RestTemplate();
